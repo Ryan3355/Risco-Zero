@@ -280,6 +280,14 @@
     .modal h3{margin:0;font-size:28px;line-height:1.1}
     .modal p{margin:8px 0 0;color:#33425a;font-size:18px;line-height:1.5}
     .modal-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:18px}
+    .qr-access-btn{width:100%;margin-top:18px;height:52px;border:1px solid #bdd0e8;border-radius:12px;background:#eef5ff;color:#123864;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:10px}
+    .qr-access-btn:hover{background:#e1efff}
+    .qr-modal{text-align:center}
+    .qr-modal .modal-head{justify-content:center}
+    .qr-modal .modal-head .dot{background:#0b4b8d;font-size:26px}
+    .qr-code{width:210px;height:210px;margin:18px auto 14px;padding:10px;border:1px solid #dbe3ee;border-radius:16px;background:#fff;display:block}
+    .qr-link{display:block;max-width:100%;overflow-wrap:anywhere;color:#164d86;font-size:14px;line-height:1.4}
+    .qr-help{font-size:14px !important;color:#65738a !important}
 
     @media (max-width: 1280px){
       .hero-copy{margin-left:220px;max-width:360px}.hero-copy h2{font-size:54px}
@@ -966,7 +974,7 @@
 
   </style>
 </head>
-<body>
+<body data-site-url="">
   <header class="topbar">
     <div class="topbar-inner">
       <div class="brand">
@@ -1046,6 +1054,7 @@
             <div id="loginError" class="login-error"></div>
           </form>
           <div class="usage-note"><i>♢</i> Uso interno - Totem de Segurança</div>
+          <button class="qr-access-btn" id="openQrBtn" type="button" aria-haspopup="dialog">▦ Acessar pelo celular</button>
           <div class="demo-list">
             <b>Acessos de demonstração</b>
             <code>joao.silva / 1234</code>
@@ -1156,6 +1165,20 @@
     </section>
   </main>
 
+  <div id="qrModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="qrTitle">
+    <div class="modal qr-modal">
+      <div class="modal-head"><div class="dot">▦</div><h3 id="qrTitle">Acesse pelo celular</h3></div>
+      <p>Aponte a câmera para o QR Code para abrir este checklist.</p>
+      <img id="qrCodeImage" class="qr-code" alt="QR Code para acessar o Checklist Diário de Segurança" />
+      <a id="qrLink" class="qr-link" href="#" target="_blank" rel="noopener"></a>
+      <p id="qrHelp" class="qr-help">Publique o site em um endereço acessível pela rede para que outros celulares consigam abrir o link.</p>
+      <div class="modal-actions">
+        <button type="button" class="mini-btn" id="copyQrLinkBtn">Copiar link</button>
+        <button type="button" class="mini-btn subtle" id="closeQrModal">Fechar</button>
+      </div>
+    </div>
+  </div>
+
   <div id="criticalModal" class="modal-backdrop hidden">
     <div class="modal">
       <div class="modal-head"><div class="dot">!</div><h3>Resposta crítica detectada</h3></div>
@@ -1236,8 +1259,38 @@
       progressFill: $('#progressFill'), questionCountLabel: $('#questionCountLabel'), saveDraftBtn: $('#saveDraftBtn'), callLeaderBtn: $('#callLeaderBtn'),
       checklistForm: $('#checklistForm'), resultPanel: $('#resultPanel'), historyPanel: $('#historyPanel'), historyList: $('#historyList'),
       exportCsvBtn: $('#exportCsvBtn'), printBtn: $('#printBtn'), clearHistoryBtn: $('#clearHistoryBtn'), closeHistoryBtn: $('#closeHistoryBtn'),
-      criticalModal: $('#criticalModal'), criticalMessage: $('#criticalMessage'), closeCriticalModal: $('#closeCriticalModal'), modalLeaderBtn: $('#modalLeaderBtn')
+      criticalModal: $('#criticalModal'), criticalMessage: $('#criticalMessage'), closeCriticalModal: $('#closeCriticalModal'), modalLeaderBtn: $('#modalLeaderBtn'),
+      openQrBtn: $('#openQrBtn'), qrModal: $('#qrModal'), qrCodeImage: $('#qrCodeImage'), qrLink: $('#qrLink'), qrHelp: $('#qrHelp'), copyQrLinkBtn: $('#copyQrLinkBtn'), closeQrModal: $('#closeQrModal')
     };
+
+    function getShareUrl(){
+      const configuredUrl = document.body.dataset.siteUrl?.trim();
+      return configuredUrl || window.location.href;
+    }
+
+    function openQrModal(){
+      const shareUrl = getShareUrl();
+      const isLocalFile = window.location.protocol === 'file:';
+      els.qrCodeImage.src = `https://api.qrserver.com/v1/create-qr-code/?format=svg&size=240x240&data=${encodeURIComponent(shareUrl)}`;
+      els.qrLink.href = shareUrl;
+      els.qrLink.textContent = shareUrl;
+      els.qrHelp.textContent = isLocalFile
+        ? 'Este arquivo está aberto localmente. Publique-o em um endereço da intranet ou internet e defina data-site-url no elemento body para compartilhar o endereço correto.'
+        : 'O celular precisa estar conectado à mesma rede (ou o site deve estar publicado na internet) para abrir o checklist.';
+      els.qrModal.classList.remove('hidden');
+      els.closeQrModal.focus();
+    }
+
+    async function copyShareUrl(){
+      const shareUrl = getShareUrl();
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        els.copyQrLinkBtn.textContent = 'Link copiado!';
+      } catch {
+        window.prompt('Copie o link abaixo:', shareUrl);
+      }
+      window.setTimeout(() => { els.copyQrLinkBtn.textContent = 'Copiar link'; }, 1800);
+    }
 
     function formatDate(d=new Date()){
       return new Intl.DateTimeFormat('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}).format(d);
@@ -1455,6 +1508,11 @@
     els.togglePassword.addEventListener('click', ()=>{
       els.password.type = els.password.type === 'password' ? 'text' : 'password';
     });
+    els.openQrBtn.addEventListener('click', openQrModal);
+    els.closeQrModal.addEventListener('click', ()=> els.qrModal.classList.add('hidden'));
+    els.copyQrLinkBtn.addEventListener('click', copyShareUrl);
+    els.qrModal.addEventListener('click', (event)=>{ if(event.target === els.qrModal) els.qrModal.classList.add('hidden'); });
+    document.addEventListener('keydown', (event)=>{ if(event.key === 'Escape') els.qrModal.classList.add('hidden'); });
 
     els.shiftSelect.addEventListener('change', ()=>{ if(currentUser) startDashboard(); });
     if (els.saveDraftBtn) els.saveDraftBtn.addEventListener('click', saveDraft);
