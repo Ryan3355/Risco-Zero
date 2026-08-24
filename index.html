@@ -272,6 +272,29 @@
     .history-item{padding:14px 16px;border-radius:14px;background:#fafbfd;border:1px solid var(--line)}
     .history-item strong{display:block;margin-bottom:6px;font-size:17px}
     .history-item small{display:block;color:#5d6a7d;font-size:14px;margin-top:8px}
+    .complaint-panel{margin-top:24px;padding:22px}
+    .complaint-layout{display:grid;grid-template-columns:minmax(280px,.9fr) minmax(0,1.35fr);gap:22px}
+    .complaint-form{display:grid;gap:14px;padding:18px;border:1px solid var(--line);border-radius:16px;background:#fafbfd}
+    .complaint-form label{display:grid;gap:7px;font-size:15px;font-weight:800;color:#1d3150}
+    .complaint-form input,.complaint-form select,.complaint-form textarea{width:100%;border:1px solid #cdd8e7;border-radius:10px;padding:11px 12px;background:#fff;color:#172948;font:inherit;font-weight:500}
+    .complaint-form textarea{min-height:116px;resize:vertical}
+    .complaint-form input[type="file"]{padding:8px;background:#fff}
+    .complaint-form .form-note{margin:0;color:#637087;font-size:13px;line-height:1.4}
+    .complaint-list{display:grid;gap:12px}
+    .complaint-item{padding:16px;border:1px solid var(--line);border-radius:14px;background:#fff}
+    .complaint-item header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+    .complaint-item h4{margin:0;color:#172948;font-size:18px}
+    .complaint-item p{margin:10px 0;color:#3b4c64;line-height:1.45;white-space:pre-wrap}
+    .complaint-meta{font-size:13px;color:#68758a}
+    .status-pill{display:inline-flex;align-items:center;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:850;white-space:nowrap;background:#fff4d6;color:#856100}
+    .status-pill.progress{background:#e8f2ff;color:#1461b4}.status-pill.done{background:#e7f7ec;color:#19713a}
+    .complaint-photo{display:block;width:min(220px,100%);max-height:180px;object-fit:cover;border-radius:10px;border:1px solid #d7dfe9;margin-top:12px}
+    .resolution-box{margin-top:14px;padding:13px 14px;border-radius:10px;background:#edf7ef;border-left:4px solid var(--green)}
+    .resolution-box.pending{background:#fff8e4;border-left-color:var(--yellow)}
+    .resolution-box strong{display:block;color:#173c25;margin-bottom:5px}.resolution-box.pending strong{color:#71550c}
+    .resolution-box p{margin:0;font-size:14px}.resolution-box small{display:block;margin-top:7px;color:#5c6c64}
+    .resolution-editor{display:grid;grid-template-columns:150px 1fr auto;gap:8px;margin-top:14px}
+    .resolution-editor select,.resolution-editor input{min-width:0;border:1px solid #cdd8e7;border-radius:9px;padding:9px;font:inherit}
 
     .modal-backdrop{position:fixed;inset:0;background:rgba(5,14,28,.54);display:flex;align-items:center;justify-content:center;padding:22px;z-index:30}
     .modal{width:min(520px,100%);background:#fff;border-radius:24px;box-shadow:0 30px 60px rgba(0,0,0,.28);padding:26px}
@@ -288,6 +311,11 @@
     .qr-code{width:210px;height:210px;margin:18px auto 14px;padding:10px;border:1px solid #dbe3ee;border-radius:16px;background:#fff;display:block}
     .qr-link{display:block;max-width:100%;overflow-wrap:anywhere;color:#164d86;font-size:14px;line-height:1.4}
     .qr-help{font-size:14px !important;color:#65738a !important}
+
+    @media (max-width: 760px){
+      .complaint-layout{grid-template-columns:1fr}
+      .resolution-editor{grid-template-columns:1fr}
+    }
 
     @media (max-width: 1280px){
       .hero-copy{margin-left:220px;max-width:360px}.hero-copy h2{font-size:54px}
@@ -1060,6 +1088,7 @@
             <code>joao.silva / 1234</code>
             <code>carlos.lima / 1234</code>
             <code>maria.souza / 1234</code>
+            <code>admin / admin</code>
           </div>
         </div>
       </section>
@@ -1139,6 +1168,30 @@
           <div id="historyList" class="history-list"></div>
         </section>
 
+        <section id="complaintPanel" class="complaint-panel surface hidden" aria-labelledby="complaintTitle">
+          <div class="history-head">
+            <div>
+              <div class="eyebrow">Canal de escuta</div>
+              <h3 id="complaintTitle">Reclamações e solicitações</h3>
+            </div>
+            <button class="mini-btn subtle" type="button" id="closeComplaintBtn">Fechar</button>
+          </div>
+          <div class="complaint-layout">
+            <form id="complaintForm" class="complaint-form">
+              <label>Assunto<input id="complaintSubject" name="subject" maxlength="100" required placeholder="Ex.: Iluminação na área de carga" /></label>
+              <label>Categoria<select id="complaintCategory" name="category"><option>Segurança</option><option>Estrutura e manutenção</option><option>Equipamentos e EPI</option><option>Atendimento</option><option>Outro</option></select></label>
+              <label>Relato<textarea id="complaintMessage" name="message" maxlength="1200" required placeholder="Descreva o ocorrido, local e impacto."></textarea></label>
+              <label>Foto (opcional)<input id="complaintPhoto" name="photo" type="file" accept="image/jpeg,image/png,image/webp" /></label>
+              <p class="form-note">Envie imagens JPG, PNG ou WebP de até 2 MB. Os registros ficam salvos neste navegador.</p>
+              <button class="mini-btn" type="submit">Enviar reclamação</button>
+            </form>
+            <div>
+              <div class="eyebrow">Acompanhe o retorno</div>
+              <div id="complaintList" class="complaint-list" aria-live="polite"></div>
+            </div>
+          </div>
+        </section>
+
         <div class="footer-bar">
           <strong>SEGURANÇA É VALOR. <b>CUIDAR DE VOCÊ É NOSSO COMPROMISSO.</b></strong>
           <span>Versão Offline 1.0.0 &nbsp; | &nbsp; Totem de Segurança - Uso Interno</span>
@@ -1194,7 +1247,8 @@
     const USERS = {
       'joao.silva': { password: '1234', nome: 'João Silva', funcao: 'Operador de Escavadeira' },
       'carlos.lima': { password: '1234', nome: 'Carlos Lima', funcao: 'Técnico de Manutenção' },
-      'maria.souza': { password: '1234', nome: 'Maria Souza', funcao: 'Supervisora de Segurança' }
+      'maria.souza': { password: '1234', nome: 'Maria Souza', funcao: 'Supervisora de Segurança' },
+      'admin': { password: 'admin', nome: 'Administrador', funcao: 'Administrador do sistema', isAdmin: true }
     };
 
     const QUESTIONS = [
@@ -1246,6 +1300,7 @@
     const QUESTIONS_PER_SHIFT = 5;
     const STORAGE_KEY = 'checklist_mineracao_registros_v4';
     const DRAFT_KEY = 'checklist_mineracao_rascunhos_v4';
+    const COMPLAINTS_KEY = 'checklist_mineracao_reclamacoes_v1';
 
     let currentUser = null;
     let currentQuestions = [];
@@ -1259,6 +1314,7 @@
       progressFill: $('#progressFill'), questionCountLabel: $('#questionCountLabel'), saveDraftBtn: $('#saveDraftBtn'), callLeaderBtn: $('#callLeaderBtn'),
       checklistForm: $('#checklistForm'), resultPanel: $('#resultPanel'), historyPanel: $('#historyPanel'), historyList: $('#historyList'),
       exportCsvBtn: $('#exportCsvBtn'), printBtn: $('#printBtn'), clearHistoryBtn: $('#clearHistoryBtn'), closeHistoryBtn: $('#closeHistoryBtn'),
+      complaintPanel: $('#complaintPanel'), complaintForm: $('#complaintForm'), complaintSubject: $('#complaintSubject'), complaintCategory: $('#complaintCategory'), complaintMessage: $('#complaintMessage'), complaintPhoto: $('#complaintPhoto'), complaintList: $('#complaintList'), closeComplaintBtn: $('#closeComplaintBtn'),
       criticalModal: $('#criticalModal'), criticalMessage: $('#criticalMessage'), closeCriticalModal: $('#closeCriticalModal'), modalLeaderBtn: $('#modalLeaderBtn'),
       openQrBtn: $('#openQrBtn'), qrModal: $('#qrModal'), qrCodeImage: $('#qrCodeImage'), qrLink: $('#qrLink'), qrHelp: $('#qrHelp'), copyQrLinkBtn: $('#copyQrLinkBtn'), closeQrModal: $('#closeQrModal')
     };
@@ -1303,6 +1359,10 @@
     function recordKey(){ return `${todayKey()}::${currentShift()}::${currentUser?.nome||'anon'}`; }
     function getJSON(key, fallback){ try{ return JSON.parse(localStorage.getItem(key)) ?? fallback; }catch{return fallback;} }
     function setJSON(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+    function escapeHtml(value){ return String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;'); }
+    function complaintStatus(status){ return status === 'Resolvida' ? 'done' : status === 'Em andamento' ? 'progress' : ''; }
+    function isAdmin(){ return currentUser?.isAdmin === true; }
+    function canResolveComplaints(){ return isAdmin(); }
 
     function seeded(seedText){ let seed=0; for(const ch of seedText){ seed=(seed*31 + ch.charCodeAt(0))>>>0; } return ()=>{ seed=(1664525*seed+1013904223)>>>0; return seed/4294967296; }; }
     function pickQuestions(){
@@ -1446,7 +1506,7 @@
     }
 
     function renderHistory(){
-      const records = getJSON(STORAGE_KEY, []).filter(r=>r.worker===currentUser.nome);
+      const records = isAdmin() ? getJSON(STORAGE_KEY, []) : getJSON(STORAGE_KEY, []).filter(r=>r.worker===currentUser.nome);
       if(!records.length){
         els.historyList.innerHTML = '<div class="history-item"><strong>Nenhum checklist salvo ainda.</strong><small>Os registros aparecerão aqui depois do primeiro envio.</small></div>';
         return;
@@ -1458,12 +1518,73 @@
           const op = q?.options.find(o=>o.value===val);
           return `<li>${q ? q.id + '. ' + q.text : qid}: <b>${op?.label || val}</b></li>`;
         }).join('');
-        return `<div class="history-item"><strong>${r.date} • ${r.shift} • ${status}</strong><div>${r.role}</div><ul>${questions}</ul><small>Registro local: ${new Date(r.createdAt).toLocaleString('pt-BR')}</small></div>`;
+        const employee = isAdmin() ? `<div><b>Funcionário:</b> ${escapeHtml(r.worker)}</div>` : '';
+        return `<div class="history-item"><strong>${r.date} • ${r.shift} • ${status}</strong>${employee}<div>${escapeHtml(r.role)}</div><ul>${questions}</ul><small>Registro local: ${new Date(r.createdAt).toLocaleString('pt-BR')}</small></div>`;
       }).join('');
     }
 
+    function getComplaints(){ return getJSON(COMPLAINTS_KEY, []); }
+
+    function renderComplaints(){
+      const complaints = getComplaints();
+      const visible = canResolveComplaints() ? complaints : complaints.filter(item=>item.worker === currentUser.nome);
+      if(!visible.length){
+        els.complaintList.innerHTML = '<div class="history-item"><strong>Nenhuma reclamação encontrada.</strong><small>Envie um relato para acompanhar a resposta da liderança neste espaço.</small></div>';
+        return;
+      }
+      els.complaintList.innerHTML = visible.map(item=>{
+        const response = item.response ? escapeHtml(item.response) : 'Aguardando análise da liderança.';
+        const statusClass = complaintStatus(item.status);
+        const photo = item.photoData ? `<img class="complaint-photo" src="${item.photoData}" alt="Foto enviada na reclamação: ${escapeHtml(item.subject)}" />` : '';
+        const resolution = `<div class="resolution-box ${item.status === 'Pendente' ? 'pending' : ''}"><strong>${item.status === 'Resolvida' ? 'Resolução' : 'Resposta da liderança'}</strong><p>${response}</p><small>${item.respondedAt ? `Atualizado em ${new Date(item.respondedAt).toLocaleString('pt-BR')}` : 'Status inicial: pendente'}</small></div>`;
+        const editor = canResolveComplaints() ? `<form class="resolution-editor" data-complaint-id="${item.id}"><select name="status"><option${item.status === 'Pendente' ? ' selected' : ''}>Pendente</option><option${item.status === 'Em andamento' ? ' selected' : ''}>Em andamento</option><option${item.status === 'Resolvida' ? ' selected' : ''}>Resolvida</option></select><input name="response" maxlength="800" value="${escapeHtml(item.response || '')}" placeholder="Resposta ou medida adotada" required /><button class="mini-btn" type="submit">Salvar retorno</button></form>` : '';
+        return `<article class="complaint-item"><header><div><h4>${escapeHtml(item.subject)}</h4><div class="complaint-meta">${escapeHtml(item.category)} · Enviado por ${escapeHtml(item.worker)} em ${new Date(item.createdAt).toLocaleString('pt-BR')}</div></div><span class="status-pill ${statusClass}">${escapeHtml(item.status)}</span></header><p>${escapeHtml(item.message)}</p>${photo}${resolution}${editor}</article>`;
+      }).join('');
+      document.querySelectorAll('.resolution-editor').forEach(form=>form.addEventListener('submit', saveComplaintResolution));
+    }
+
+    function photoToDataUrl(file){
+      return new Promise((resolve, reject)=>{
+        if(!file) return resolve('');
+        if(!['image/jpeg','image/png','image/webp'].includes(file.type) || file.size > 2 * 1024 * 1024){
+          reject(new Error('Selecione uma imagem JPG, PNG ou WebP de até 2 MB.'));
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = ()=>resolve(String(reader.result));
+        reader.onerror = ()=>reject(new Error('Não foi possível ler a imagem selecionada.'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function submitComplaint(event){
+      event.preventDefault();
+      try{
+        const photoData = await photoToDataUrl(els.complaintPhoto.files[0]);
+        const complaints = getComplaints();
+        complaints.unshift({ id: crypto?.randomUUID ? crypto.randomUUID() : String(Date.now()), worker: currentUser.nome, subject: els.complaintSubject.value.trim(), category: els.complaintCategory.value, message: els.complaintMessage.value.trim(), photoData, status: 'Pendente', response: '', createdAt: new Date().toISOString(), respondedAt: '' });
+        setJSON(COMPLAINTS_KEY, complaints);
+        els.complaintForm.reset();
+        renderComplaints();
+        alert('Reclamação enviada. Você poderá acompanhar a resposta nesta aba.');
+      }catch(error){ alert(error.message || 'Não foi possível enviar a reclamação.'); }
+    }
+
+    function saveComplaintResolution(event){
+      event.preventDefault();
+      const form = event.currentTarget;
+      const complaints = getComplaints();
+      const item = complaints.find(complaint=>complaint.id === form.dataset.complaintId);
+      if(!item) return;
+      item.status = form.elements.status.value;
+      item.response = form.elements.response.value.trim();
+      item.respondedAt = new Date().toISOString();
+      setJSON(COMPLAINTS_KEY, complaints);
+      renderComplaints();
+    }
+
     function exportCsv(){
-      const records = getJSON(STORAGE_KEY, []).filter(r=>r.worker===currentUser.nome);
+      const records = isAdmin() ? getJSON(STORAGE_KEY, []) : getJSON(STORAGE_KEY, []).filter(r=>r.worker===currentUser.nome);
       if(!records.length){ alert('Não há registros para exportar.'); return; }
       const rows = [['Data','Turno','Profissional','Função','Status','Pergunta','Resposta']];
       records.forEach(r=>{
@@ -1487,6 +1608,7 @@
       els.currentDate.textContent = formatDate();
       renderQuestions(loadDraft());
       renderHistory();
+      renderComplaints();
       els.loginScreen.classList.add('hidden');
       els.dashboardScreen.classList.remove('hidden');
     }
@@ -1501,7 +1623,7 @@
         return;
       }
       els.loginError.textContent = '';
-      currentUser = { username:user, nome:found.nome, funcao:found.funcao };
+      currentUser = { username:user, ...found };
       startDashboard();
     });
 
@@ -1530,19 +1652,24 @@
       showResult(summary);
       renderHistory();
     });
+    els.complaintForm.addEventListener('submit', submitComplaint);
+    els.closeComplaintBtn.addEventListener('click', ()=> els.complaintPanel.classList.add('hidden'));
 
     const historyToggleBtn = document.createElement('button');
     historyToggleBtn.type='button'; historyToggleBtn.className='mini-btn'; historyToggleBtn.textContent='Histórico';
     historyToggleBtn.addEventListener('click', ()=> els.historyPanel.classList.toggle('hidden'));
+    const complaintToggleBtn = document.createElement('button');
+    complaintToggleBtn.type='button'; complaintToggleBtn.className='mini-btn'; complaintToggleBtn.textContent='Reclamações';
+    complaintToggleBtn.addEventListener('click', ()=>{ els.complaintPanel.classList.toggle('hidden'); if(!els.complaintPanel.classList.contains('hidden')){ renderComplaints(); els.complaintPanel.scrollIntoView({behavior:'smooth', block:'start'}); } });
     const logoutBtn = document.createElement('button');
     logoutBtn.type='button'; logoutBtn.className='mini-btn subtle'; logoutBtn.textContent='Sair';
     logoutBtn.addEventListener('click', ()=> location.reload());
     document.querySelector('.section-title').insertAdjacentHTML('beforebegin', '<div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0 10px;gap:12px;flex-wrap:wrap"><div></div><div id="toolbarButtons" style="display:flex;gap:10px;flex-wrap:wrap"></div></div>');
-    $('#toolbarButtons').append(historyToggleBtn, logoutBtn);
+    $('#toolbarButtons').append(historyToggleBtn, complaintToggleBtn, logoutBtn);
 
     els.exportCsvBtn.addEventListener('click', exportCsv);
     els.printBtn.addEventListener('click', ()=> window.print());
-    els.clearHistoryBtn.addEventListener('click', ()=>{ if(confirm('Deseja limpar todo o histórico local deste usuário?')){ const filtered = getJSON(STORAGE_KEY, []).filter(r=>r.worker!==currentUser.nome); setJSON(STORAGE_KEY, filtered); renderHistory(); } });
+    els.clearHistoryBtn.addEventListener('click', ()=>{ const allRecords = isAdmin(); const message = allRecords ? 'Deseja limpar todo o histórico local de todos os funcionários?' : 'Deseja limpar todo o histórico local deste usuário?'; if(confirm(message)){ const filtered = allRecords ? [] : getJSON(STORAGE_KEY, []).filter(r=>r.worker!==currentUser.nome); setJSON(STORAGE_KEY, filtered); renderHistory(); } });
     els.closeHistoryBtn.addEventListener('click', ()=> els.historyPanel.classList.add('hidden'));
   </script>
 </body>
